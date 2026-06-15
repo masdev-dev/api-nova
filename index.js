@@ -14,18 +14,15 @@ const client = new Client({
 
 client.connect();
 
-// Rota raiz
 app.get("/", (req, res) => {
   res.json({ message: "API Orion Group - com leads e admin" });
 });
 
-// Endpoint para listar usuários (existente)
 app.get("/usuarios", async (req, res) => {
   const result = await client.query("SELECT * FROM usuarios ORDER BY id");
   res.json(result.rows);
 });
 
-// Endpoint para criar usuários (existente)
 app.post("/usuarios", async (req, res) => {
   const { nome, idade } = req.body;
   if (!nome || !idade) return res.status(400).json({ error: "Nome e idade obrigatórios" });
@@ -36,7 +33,6 @@ app.post("/usuarios", async (req, res) => {
   res.status(201).json(result.rows[0]);
 });
 
-// Endpoint para receber leads do formulário
 app.post("/leads", async (req, res) => {
   const { nome, email, telefone, mensagem } = req.body;
   if (!nome || !email) return res.status(400).json({ error: "Nome e email obrigatórios" });
@@ -53,15 +49,13 @@ app.post("/leads", async (req, res) => {
   }
 });
 
-// 🔐 ENDPOINT ADMIN - listar todos os leads (protegido por senha)
+// ENDPOINT ADMIN: listar leads (protegido por senha)
 app.get("/admin/leads", async (req, res) => {
-  const { senha } = req.query;
-  const adminPass = process.env.ADMIN_PASS;
-
-  if (!adminPass || senha !== adminPass) {
-    return res.status(401).json({ error: "Acesso negado. Senha inválida." });
+  const senha = req.query.senha;
+  const senhaCorreta = process.env.ADMIN_PASS;
+  if (!senha || senha !== senhaCorreta) {
+    return res.status(401).json({ error: "Acesso não autorizado" });
   }
-
   try {
     const result = await client.query("SELECT * FROM leads ORDER BY criado_em DESC");
     res.json(result.rows);
