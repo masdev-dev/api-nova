@@ -15,7 +15,7 @@ const client = new Client({
 client.connect();
 
 app.get("/", (req, res) => {
-  res.json({ message: "API rodando!" });
+  res.json({ message: "API Orion Group - com leads" });
 });
 
 app.get("/usuarios", async (req, res) => {
@@ -31,6 +31,22 @@ app.post("/usuarios", async (req, res) => {
     [nome, idade]
   );
   res.status(201).json(result.rows[0]);
+});
+
+app.post("/leads", async (req, res) => {
+  const { nome, email, telefone, mensagem } = req.body;
+  if (!nome || !email) return res.status(400).json({ error: "Nome e email obrigatórios" });
+  try {
+    const result = await client.query(
+      `INSERT INTO leads (nome, email, telefone, mensagem, status) 
+       VALUES ($1, $2, $3, $4, 'novo') RETURNING *`,
+      [nome, email, telefone || null, mensagem || null]
+    );
+    res.status(201).json({ success: true, lead: result.rows[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erro ao salvar lead" });
+  }
 });
 
 app.listen(port, () => {
