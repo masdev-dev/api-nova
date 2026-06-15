@@ -4,6 +4,8 @@ const { Client } = require("pg");
 const cors = require('cors');
 
 const app = express();
+const cors = require('cors');
+app.use(cors()); // Permite requisições de qualquer origem (apenas para teste)
 app.use(cors());
 app.use(express.json());
 
