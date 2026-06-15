@@ -1,12 +1,10 @@
 require("dotenv").config();
 const express = require("express");
 const { Client } = require("pg");
+const cors = require('cors');
 
 const app = express();
-const cors = require('cors');
 app.use(cors());
-const port = process.env.PORT || 3000;
-
 app.use(express.json());
 
 const client = new Client({
